@@ -1,4 +1,5 @@
 import pygame
+from laser import Laser
 
 
 class Player(pygame.sprite.Sprite):
@@ -13,8 +14,10 @@ class Player(pygame.sprite.Sprite):
         self.laser_time = 0
         self.laser_cooldown = 600
 
+        self.lasers = pygame.sprite.Group()
+
     def shoot(self):
-        print("shoot")
+        self.lasers.add(Laser(self.rect.center, self.rect.bottom))
 
     def recharge(self):
         if not self.ready:
@@ -45,3 +48,4 @@ class Player(pygame.sprite.Sprite):
         self.move()
         self.constraint()
         self.recharge()
+        self.lasers.update()
