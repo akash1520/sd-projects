@@ -1,6 +1,8 @@
 import pygame
 import sys
 import obstacle
+import random
+from laser import Laser
 from player import Player
 from alien import Alien
 
@@ -29,6 +31,7 @@ class Game:
 
         # alien setup
         self.aliens = pygame.sprite.Group()
+        self.alien_lasers = pygame.sprite.Group()
         self.alien_x_direction = 1
         self.alien_setup(rows=6, cols=8)
 
@@ -76,16 +79,24 @@ class Game:
             for alien in self.aliens.sprites():
                 alien.rect.y += y_distance
 
+    def alien_shoot(self):
+        if self.aliens.sprites():
+            random_alien = random.choice(self.aliens.sprites())
+            laser_sprite = Laser(random_alien.rect.center, screen_height, 6)
+            self.alien_lasers.add(laser_sprite)
+
     def run(self):
         self.player.update()
         self.aliens.update(self.alien_x_direction)
         self.alien_position_checker()
+        self.alien_lasers.update()
 
         self.player.sprite.lasers.draw(screen)
         self.player.draw(screen)
 
         self.blocks.draw(screen)
         self.aliens.draw(screen)
+        self.alien_lasers.draw(screen)
         # update all sprite groups
         # draw all sprite groups
 
@@ -98,11 +109,16 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     game = Game()
 
+    ALIENLASER = pygame.USEREVENT + 1
+    pygame.time.set_timer(ALIENLASER, 800)
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == ALIENLASER:
+                game.alien_shoot()
 
         screen.fill((30, 30, 30))
         game.run()
