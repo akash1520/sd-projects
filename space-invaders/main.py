@@ -1,7 +1,8 @@
 import pygame
 import sys
-from player import Player
 import obstacle
+from player import Player
+from alien import Alien
 
 
 class Game:
@@ -26,6 +27,11 @@ class Game:
             offset=self.obstacle_x_positions
         )
 
+        # alien setup
+        self.aliens = pygame.sprite.Group()
+        self.alien_x_direction = 1
+        self.alien_setup(rows=6, cols=8)
+
     def create_obstacle(self, x_start, y_start, offset_x):
         for row_index, row in enumerate(self.shape):
             for col_index, col in enumerate(row):
@@ -41,13 +47,45 @@ class Game:
             self.create_obstacle(x_start, y_start, offset_x)
             offset_x += 90
 
+    def alien_setup(self, rows, cols, x_distance=60, y_distance=48, offset_x=70, offset_y=100):
+        for row_index, row in enumerate(range(rows)):
+            for col_index, col in enumerate(range(cols)):
+                x = col_index * x_distance + offset_x
+                y = row_index * y_distance + offset_y
+
+                if row_index == 0:
+                    alien_sprite = Alien(x, y, 'yellow')
+                elif 1 <= row_index <= 2:
+                    alien_sprite = Alien(x, y, 'green')
+                else:
+                    alien_sprite = Alien(x, y, 'red')
+                self.aliens.add(alien_sprite)
+
+    def alien_position_checker(self):
+        all_aliens = self.aliens.sprites()
+        for alien in all_aliens:
+            if alien.rect.right >= screen_width:
+                self.alien_x_direction = -1
+                self.alien_move_down(2)
+            elif alien.rect.left <= 0:
+                self.alien_x_direction = 1
+                self.alien_move_down(2)
+
+    def alien_move_down(self, y_distance):
+        if self.aliens:
+            for alien in self.aliens.sprites():
+                alien.rect.y += y_distance
+
     def run(self):
         self.player.update()
+        self.aliens.update(self.alien_x_direction)
+        self.alien_position_checker()
 
         self.player.sprite.lasers.draw(screen)
         self.player.draw(screen)
 
         self.blocks.draw(screen)
+        self.aliens.draw(screen)
         # update all sprite groups
         # draw all sprite groups
 
