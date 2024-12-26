@@ -4,7 +4,7 @@ import obstacle
 import random
 from laser import Laser
 from player import Player
-from alien import Alien
+from alien import Alien, Extra
 
 
 class Game:
@@ -34,6 +34,10 @@ class Game:
         self.alien_lasers = pygame.sprite.Group()
         self.alien_x_direction = 1
         self.alien_setup(rows=6, cols=8)
+
+        # extra alien setup
+        self.extra_alien = pygame.sprite.GroupSingle()
+        self.extra_alien_spawn_time = random.randint(400, 800)
 
     def create_obstacle(self, x_start, y_start, offset_x):
         for row_index, row in enumerate(self.shape):
@@ -69,10 +73,10 @@ class Game:
         for alien in all_aliens:
             if alien.rect.right >= screen_width:
                 self.alien_x_direction = -1
-                self.alien_move_down(2)
+                self.alien_move_down(1)
             elif alien.rect.left <= 0:
                 self.alien_x_direction = 1
-                self.alien_move_down(2)
+                self.alien_move_down(1)
 
     def alien_move_down(self, y_distance):
         if self.aliens:
@@ -85,11 +89,21 @@ class Game:
             laser_sprite = Laser(random_alien.rect.center, screen_height, 6)
             self.alien_lasers.add(laser_sprite)
 
+    def extra_alien_timer(self):
+        self.extra_alien_spawn_time -= 1
+        if self.extra_alien_spawn_time <= 0:
+            extra_alien_sprite = Extra(
+                random.choice(['right', 'left']), screen_width)
+            self.extra_alien.add(extra_alien_sprite)
+            self.extra_alien_spawn_time = random.randint(400, 800)
+
     def run(self):
         self.player.update()
         self.aliens.update(self.alien_x_direction)
         self.alien_position_checker()
         self.alien_lasers.update()
+        self.extra_alien_timer()
+        self.extra_alien.update()
 
         self.player.sprite.lasers.draw(screen)
         self.player.draw(screen)
@@ -97,6 +111,7 @@ class Game:
         self.blocks.draw(screen)
         self.aliens.draw(screen)
         self.alien_lasers.draw(screen)
+        self.extra_alien.draw(screen)
         # update all sprite groups
         # draw all sprite groups
 
