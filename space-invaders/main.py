@@ -177,6 +177,26 @@ class Game:
         # draw all sprite groups
 
 
+class CRT:
+    def __init__(self, screen_width, screen_height):
+        self.tv = pygame.image.load('./graphics/tv.png').convert_alpha()
+        self.tv = pygame.transform.scale(
+            self.tv, (screen_width, screen_height))
+
+    def create_crt_lines(self):
+        line_height = 3
+        line_amount = int(screen_height / line_height)
+        for line in range(line_amount):
+            y_pos = line * line_height
+            pygame.draw.line(self.tv, 'black', (0, y_pos),
+                             (screen_width, y_pos), 1)
+
+    def draw(self):
+        self.tv.set_alpha(random.randint(75, 90))
+        self.create_crt_lines()
+        screen.blit(self.tv, (0, 0))
+
+
 if __name__ == '__main__':
     pygame.init()
     screen_width = 600
@@ -184,6 +204,7 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode((screen_width, screen_height))
     clock = pygame.time.Clock()
     game = Game()
+    crt = CRT(screen_width, screen_height)
 
     ALIENLASER = pygame.USEREVENT + 1
     pygame.time.set_timer(ALIENLASER, 800)
@@ -198,6 +219,7 @@ if __name__ == '__main__':
 
         screen.fill((30, 30, 30))
         game.run()
+        crt.draw()
 
         pygame.display.flip()
         clock.tick(60)
