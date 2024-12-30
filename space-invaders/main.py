@@ -167,6 +167,14 @@ class Game:
         score_rect = score_text.get_rect(topleft=(10, -10))
         screen.blit(score_text, score_rect)
 
+    def victory_message(self):
+        if not self.aliens.sprites():
+            victory_text = self.font.render(
+                'Victory!', False, 'white')
+            victory_rect = victory_text.get_rect(
+                center=(screen_width/2, screen_height/2))
+            screen.blit(victory_text, victory_rect)
+
     def run(self):
         self.player.update()
         self.alien_lasers.update()
@@ -185,6 +193,7 @@ class Game:
         self.extra_alien.draw(screen)
         self.display_lives()
         self.display_score()
+        self.victory_message()
         # update all sprite groups
         # draw all sprite groups
 
